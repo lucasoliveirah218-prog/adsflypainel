@@ -2,8 +2,11 @@ import { Router, Request, Response } from "express";
 import { db, companiesTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { GetRecentCompaniesQueryParams } from "@workspace/api-zod";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+router.use(requireAuth);
 
 function mapCompany(c: typeof companiesTable.$inferSelect) {
   return {

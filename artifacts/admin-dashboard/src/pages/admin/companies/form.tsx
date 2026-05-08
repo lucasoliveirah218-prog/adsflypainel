@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,6 +13,7 @@ import {
   getGetCompanyQueryKey,
   getListCompaniesQueryKey
 } from "@workspace/api-client-react";
+import type { CompanyCreateInput, CompanyUpdateInput } from "@workspace/api-client-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +47,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function CompanyForm({ id }: { id?: string }) {
+export default function CompanyForm({ id: idProp }: { id?: string }) {
+  const routeParams = useParams<{ id?: string }>();
+  const id = idProp ?? routeParams?.id;
   const isEditing = !!id;
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
@@ -133,14 +136,38 @@ export default function CompanyForm({ id }: { id?: string }) {
   });
 
   const onSubmit = (values: FormValues) => {
-    // Clean up empty strings to undefined to match API types if needed
-    const payload = Object.fromEntries(
-      Object.entries(values).map(([k, v]) => [k, v === "" ? undefined : v])
-    ) as any;
+    const str = (v: string | undefined): string | null =>
+      v === "" || v === undefined ? null : v;
 
     if (isEditing) {
+      const payload: CompanyUpdateInput = {
+        name: values.name,
+        subdomain: values.subdomain,
+        cnpj: str(values.cnpj),
+        phone: str(values.phone),
+        whatsapp: str(values.whatsapp),
+        email: str(values.email),
+        address: str(values.address),
+        city: str(values.city),
+        state: str(values.state),
+        metaTitle: str(values.metaTitle),
+        metaDescription: str(values.metaDescription),
+      };
       updateMutation.mutate({ id: id as string, data: payload });
     } else {
+      const payload: CompanyCreateInput = {
+        name: values.name,
+        subdomain: values.subdomain,
+        cnpj: str(values.cnpj),
+        phone: str(values.phone),
+        whatsapp: str(values.whatsapp),
+        email: str(values.email),
+        address: str(values.address),
+        city: str(values.city),
+        state: str(values.state),
+        metaTitle: str(values.metaTitle),
+        metaDescription: str(values.metaDescription),
+      };
       createMutation.mutate({ data: payload });
     }
   };

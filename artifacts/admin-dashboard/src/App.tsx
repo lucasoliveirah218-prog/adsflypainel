@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function ProtectedRoute({ component: Component, ...rest }: { component: any }) {
+function ProtectedRoute({ component: Component, ...rest }: { component: any; [key: string]: any }) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [, setLocation] = useLocation();
@@ -66,7 +66,7 @@ function Router() {
       <Route path="/admin" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/admin/companies" component={() => <ProtectedRoute component={CompaniesList} />} />
       <Route path="/admin/companies/new" component={() => <ProtectedRoute component={CompanyForm} />} />
-      <Route path="/admin/companies/:id/edit" component={(params) => <ProtectedRoute component={CompanyForm} id={params.id} />} />
+      <Route path="/admin/companies/:id/edit" component={() => <ProtectedRoute component={CompanyForm} />} />
       <Route path="/:subdomain" component={SubdomainPage} />
       <Route path="/">
         <Redirect to="/admin" />

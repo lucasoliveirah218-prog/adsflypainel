@@ -11,6 +11,7 @@ import {
   GenerateCompanyPageParams,
   GetCompanyBySubdomainParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
 
@@ -95,6 +96,32 @@ function mapCompany(c: typeof companiesTable.$inferSelect) {
   };
 }
 
+// GET /companies/subdomain/:subdomain — public, no auth required (serves landing pages)
+router.get("/subdomain/:subdomain", async (req: Request, res: Response) => {
+  const parsed = GetCompanyBySubdomainParams.safeParse(req.params);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid params" });
+    return;
+  }
+
+  try {
+    const [company] = await db
+      .select()
+      .from(companiesTable)
+      .where(eq(companiesTable.subdomain, parsed.data.subdomain));
+    if (!company) {
+      res.status(404).json({ error: "Company not found" });
+      return;
+    }
+    res.json(mapCompany(company));
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+// All routes below this point require a valid Supabase session token
+router.use(requireAuth);
+
 // GET /companies
 router.get("/", async (req: Request, res: Response) => {
   const parsed = ListCompaniesQueryParams.safeParse(req.query);
@@ -151,29 +178,6 @@ router.post("/", async (req: Request, res: Response) => {
       .values(parsed.data)
       .returning();
     res.status(201).json(mapCompany(company));
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-// GET /companies/subdomain/:subdomain — must come before /:id
-router.get("/subdomain/:subdomain", async (req: Request, res: Response) => {
-  const parsed = GetCompanyBySubdomainParams.safeParse(req.params);
-  if (!parsed.success) {
-    res.status(400).json({ error: "Invalid params" });
-    return;
-  }
-
-  try {
-    const [company] = await db
-      .select()
-      .from(companiesTable)
-      .where(eq(companiesTable.subdomain, parsed.data.subdomain));
-    if (!company) {
-      res.status(404).json({ error: "Company not found" });
-      return;
-    }
-    res.json(mapCompany(company));
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
