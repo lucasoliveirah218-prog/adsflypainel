@@ -18,4 +18,11 @@ export interface CompanyCreateInput {
   metaTitle?: string | null;
   metaDescription?: string | null;
   subdomain: string;
+  about?: string | null;
+  services?: string | null;
+  mapsQuery?: string | null;
+  facebookVerification?: string | null;
+  domain?: string | null;
+  status?: string | null;
+  foundationDate?: string | null;
 }

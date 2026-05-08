@@ -20,6 +20,13 @@ export interface Company {
   metaDescription?: string | null;
   subdomain: string;
   htmlContent?: string | null;
+  about?: string | null;
+  services?: string | null;
+  mapsQuery?: string | null;
+  facebookVerification?: string | null;
+  domain?: string | null;
+  status?: string | null;
+  foundationDate?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -15,65 +15,184 @@ import { requireAuth } from "../middleware/auth";
 
 const router = Router();
 
+const LANDING_PAGE_TEMPLATE = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="facebook-domain-verification" content="{{facebook_verification}}">
+
+<title>{{meta_title}}</title>
+
+<meta name="description" content="{{meta_description}}">
+
+<meta property="og:title" content="{{meta_title}}">
+<meta property="og:description" content="{{meta_description}}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://{{domain}}">
+
+<meta name="robots" content="index, follow">
+
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  color:#333;
+}
+
+header {
+  background:#0f172a;
+  color:#fff;
+  padding:40px 20px;
+  text-align:center;
+}
+
+.container {
+  max-width:1000px;
+  margin:30px auto;
+  padding:20px;
+}
+
+.card {
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
+  margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+.button {
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 20px;
+  background:#2563eb;
+  color:#fff;
+  border-radius:6px;
+  text-decoration:none;
+}
+
+.footer {
+  text-align:center;
+  padding:30px;
+  font-size:13px;
+  color:#777;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <h1>{{company}}</h1>
+  <p>{{services}}</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Dados da Empresa</h2>
+
+    <p><strong>CNPJ:</strong> {{cnpj}}</p>
+    <p><strong>Situação:</strong> {{status}}</p>
+    <p><strong>Fundação:</strong> {{foundation_date}}</p>
+    <p><strong>Localização:</strong> {{city}} - {{state}}</p>
+    <p><strong>Endereço:</strong> {{address}}</p>
+
+  </div>
+
+  <div class="card">
+    <h2>Sobre</h2>
+
+    <p>{{about}}</p>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Contato</h2>
+
+    <p><strong>Telefone:</strong> {{phone}}</p>
+    <p><strong>Email:</strong> {{email}}</p>
+
+    <a href="https://wa.me/{{whatsapp}}" class="button">
+      Falar no WhatsApp
+    </a>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Localização</h2>
+
+    <iframe
+      src="https://maps.google.com/maps?q={{maps_query}}&output=embed"
+      width="100%"
+      height="250"
+      style="border:0;">
+    </iframe>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Atividades Econômicas</h2>
+
+    <p>{{services}}</p>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  © 2026 - {{company}} - Todos os direitos reservados
+</div>
+
+</body>
+</html>`;
+
 function generateHtml(company: typeof companiesTable.$inferSelect): string {
   const name = company.name ?? "";
   const metaTitle = company.metaTitle ?? name;
   const metaDescription = company.metaDescription ?? "";
   const phone = company.phone ?? "";
-  const whatsapp = company.whatsapp ?? "";
+  const whatsapp = (company.whatsapp ?? "").replace(/\D/g, "");
   const email = company.email ?? "";
   const address = company.address ?? "";
   const city = company.city ?? "";
   const state = company.state ?? "";
+  const cnpj = company.cnpj ?? "";
+  const status = company.status ?? "";
+  const foundationDate = company.foundationDate ?? "";
+  const about = company.about ?? "";
+  const services = company.services ?? "";
+  const mapsQuery = encodeURIComponent(
+    company.mapsQuery ?? [address, city, state].filter(Boolean).join(", "),
+  );
+  const facebookVerification = company.facebookVerification ?? "";
+  const domain = company.domain ?? `${company.subdomain}.domain.com`;
 
-  const contactItems: string[] = [];
-  if (phone) contactItems.push(`<li>Telefone: <a href="tel:${phone}">${phone}</a></li>`);
-  if (whatsapp) contactItems.push(`<li>WhatsApp: <a href="https://wa.me/${whatsapp.replace(/\D/g, "")}" target="_blank">${whatsapp}</a></li>`);
-  if (email) contactItems.push(`<li>Email: <a href="mailto:${email}">${email}</a></li>`);
-  const fullAddress = [address, city, state].filter(Boolean).join(", ");
-  if (fullAddress) contactItems.push(`<li>Endereco: ${fullAddress}</li>`);
-
-  return `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${metaTitle}</title>
-  <meta name="description" content="${metaDescription}" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; }
-    header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 4rem 2rem; text-align: center; }
-    header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
-    header p { font-size: 1.125rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
-    main { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
-    .card { background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-    .card h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e40af; }
-    ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
-    li { font-size: 1rem; }
-    a { color: #2563eb; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    footer { text-align: center; padding: 2rem; color: #64748b; font-size: 0.875rem; border-top: 1px solid #e2e8f0; margin-top: 2rem; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>${name}</h1>
-    ${metaDescription ? `<p>${metaDescription}</p>` : ""}
-  </header>
-  <main>
-    ${contactItems.length > 0 ? `
-    <div class="card">
-      <h2>Contato</h2>
-      <ul>${contactItems.map((i) => `\n      ${i}`).join("")}
-      </ul>
-    </div>` : ""}
-  </main>
-  <footer>
-    <p>&copy; ${new Date().getFullYear()} ${name}. Todos os direitos reservados.</p>
-  </footer>
-</body>
-</html>`;
+  return LANDING_PAGE_TEMPLATE
+    .replace(/{{company}}/g, name)
+    .replace(/{{meta_title}}/g, metaTitle)
+    .replace(/{{meta_description}}/g, metaDescription)
+    .replace(/{{facebook_verification}}/g, facebookVerification)
+    .replace(/{{domain}}/g, domain)
+    .replace(/{{cnpj}}/g, cnpj)
+    .replace(/{{status}}/g, status)
+    .replace(/{{foundation_date}}/g, foundationDate)
+    .replace(/{{city}}/g, city)
+    .replace(/{{state}}/g, state)
+    .replace(/{{address}}/g, address)
+    .replace(/{{phone}}/g, phone)
+    .replace(/{{whatsapp}}/g, whatsapp)
+    .replace(/{{email}}/g, email)
+    .replace(/{{about}}/g, about)
+    .replace(/{{services}}/g, services)
+    .replace(/{{maps_query}}/g, mapsQuery);
 }
 
 function mapCompany(c: typeof companiesTable.$inferSelect) {
@@ -91,6 +210,13 @@ function mapCompany(c: typeof companiesTable.$inferSelect) {
     metaDescription: c.metaDescription ?? null,
     subdomain: c.subdomain,
     htmlContent: c.htmlContent ?? null,
+    about: c.about ?? null,
+    services: c.services ?? null,
+    mapsQuery: c.mapsQuery ?? null,
+    facebookVerification: c.facebookVerification ?? null,
+    domain: c.domain ?? null,
+    status: c.status ?? null,
+    foundationDate: c.foundationDate ?? null,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
   };
@@ -113,7 +239,9 @@ router.get("/subdomain/:subdomain", async (req: Request, res: Response) => {
       res.status(404).json({ error: "Company not found" });
       return;
     }
-    res.json(mapCompany(company));
+    const mapped = mapCompany(company);
+    mapped.htmlContent = generateHtml(company);
+    res.json(mapped);
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }

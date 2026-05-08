@@ -43,6 +43,13 @@ const formSchema = z.object({
   subdomain: z.string().min(2, "Subdomain must be at least 2 characters").regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and hyphens allowed"),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
+  about: z.string().optional(),
+  services: z.string().optional(),
+  mapsQuery: z.string().optional(),
+  facebookVerification: z.string().optional(),
+  domain: z.string().optional(),
+  status: z.string().optional(),
+  foundationDate: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,6 +75,13 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       subdomain: "",
       metaTitle: "",
       metaDescription: "",
+      about: "",
+      services: "",
+      mapsQuery: "",
+      facebookVerification: "",
+      domain: "",
+      status: "",
+      foundationDate: "",
     },
   });
 
@@ -92,6 +106,13 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         subdomain: company.subdomain || "",
         metaTitle: company.metaTitle || "",
         metaDescription: company.metaDescription || "",
+        about: company.about || "",
+        services: company.services || "",
+        mapsQuery: company.mapsQuery || "",
+        facebookVerification: company.facebookVerification || "",
+        domain: company.domain || "",
+        status: company.status || "",
+        foundationDate: company.foundationDate || "",
       });
     }
   }, [company, form]);
@@ -152,6 +173,13 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         state: str(values.state),
         metaTitle: str(values.metaTitle),
         metaDescription: str(values.metaDescription),
+        about: str(values.about),
+        services: str(values.services),
+        mapsQuery: str(values.mapsQuery),
+        facebookVerification: str(values.facebookVerification),
+        domain: str(values.domain),
+        status: str(values.status),
+        foundationDate: str(values.foundationDate),
       };
       updateMutation.mutate({ id: id as string, data: payload });
     } else {
@@ -167,6 +195,13 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         state: str(values.state),
         metaTitle: str(values.metaTitle),
         metaDescription: str(values.metaDescription),
+        about: str(values.about),
+        services: str(values.services),
+        mapsQuery: str(values.mapsQuery),
+        facebookVerification: str(values.facebookVerification),
+        domain: str(values.domain),
+        status: str(values.status),
+        foundationDate: str(values.foundationDate),
       };
       createMutation.mutate({ data: payload });
     }
@@ -187,11 +222,26 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       form.setValue("name", data.razao_social || "", { shouldValidate: true });
       form.setValue("phone", data.ddd_telefone_1 || "", { shouldValidate: true });
       form.setValue("email", data.email || "", { shouldValidate: true });
-      form.setValue("address", `${data.logradouro}, ${data.numero}`, { shouldValidate: true });
+      form.setValue("address", [data.logradouro, data.numero].filter(Boolean).join(", "), { shouldValidate: true });
       form.setValue("city", data.municipio || "", { shouldValidate: true });
       form.setValue("state", data.uf || "", { shouldValidate: true });
-      
-      // Auto-generate subdomain from name if empty
+      form.setValue("status", data.descricao_situacao_cadastral || "", { shouldValidate: true });
+      form.setValue("foundationDate", data.data_inicio_atividade || "", { shouldValidate: true });
+
+      const primaryCnae = data.cnae_fiscal_descricao || "";
+      const secondaryCnaes: string[] = (data.cnaes_secundarios ?? [])
+        .map((c: { descricao: string }) => c.descricao)
+        .filter(Boolean);
+      const allServices = [primaryCnae, ...secondaryCnaes].filter(Boolean).join("; ");
+      form.setValue("services", allServices, { shouldValidate: true });
+
+      if (!form.getValues("mapsQuery") && (data.logradouro || data.municipio)) {
+        const mq = [data.logradouro, data.numero, data.municipio, data.uf]
+          .filter(Boolean)
+          .join(", ");
+        form.setValue("mapsQuery", mq, { shouldValidate: true });
+      }
+
       if (!form.getValues("subdomain") && data.razao_social) {
         const generated = data.razao_social
           .toLowerCase()
@@ -203,7 +253,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       }
 
       toast.success("Company data fetched successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch CNPJ data");
     }
   };
@@ -257,6 +307,8 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Basic Information */}
             <Card className="shadow-sm border-muted">
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
@@ -316,9 +368,38 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ATIVA" {...field} data-testid="input-status" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="foundationDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Foundation Date</FormLabel>
+                      <FormControl>
+                        <Input placeholder="2010-03-15" {...field} data-testid="input-foundation-date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
+            {/* Contact & Location */}
             <Card className="shadow-sm border-muted">
               <CardHeader>
                 <CardTitle>Contact & Location</CardTitle>
@@ -336,7 +417,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                           <Input placeholder="(00) 0000-0000" {...field} data-testid="input-phone" />
                         </FormControl>
                         <FormMessage />
-                    </FormItem>
+                      </FormItem>
                     )}
                   />
                   <FormField
@@ -349,7 +430,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                           <Input placeholder="(00) 90000-0000" {...field} data-testid="input-whatsapp" />
                         </FormControl>
                         <FormMessage />
-                    </FormItem>
+                      </FormItem>
                     )}
                   />
                 </div>
@@ -412,29 +493,110 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                     )}
                   />
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card className="md:col-span-2 shadow-sm border-muted">
-              <CardHeader>
-                <CardTitle>SEO Meta Data</CardTitle>
-                <CardDescription>Information used for search engine optimization on the generated landing page.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="metaTitle"
+                  name="mapsQuery"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Meta Title</FormLabel>
+                      <FormLabel>Maps Query</FormLabel>
                       <FormControl>
-                        <Input placeholder="Best SaaS Product | Acme Inc." {...field} data-testid="input-meta-title" />
+                        <Input placeholder="Av. Paulista, 1000, São Paulo, SP" {...field} data-testid="input-maps-query" />
                       </FormControl>
-                      <FormDescription>Leave blank to auto-generate from company name.</FormDescription>
+                      <FormDescription>Address string used to embed Google Maps on the landing page.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </CardContent>
+            </Card>
+
+            {/* Content */}
+            <Card className="md:col-span-2 shadow-sm border-muted">
+              <CardHeader>
+                <CardTitle>Landing Page Content</CardTitle>
+                <CardDescription>Text displayed on the public landing page.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="about"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>About</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Brief description of the company..."
+                          className="resize-none min-h-[80px]"
+                          {...field}
+                          data-testid="input-about"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="services"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Services / Economic Activities</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Desenvolvimento de software; Consultoria em TI..."
+                          className="resize-none min-h-[80px]"
+                          {...field}
+                          data-testid="input-services"
+                        />
+                      </FormControl>
+                      <FormDescription>Auto-filled from BrasilAPI when using CNPJ lookup.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* SEO & Meta */}
+            <Card className="md:col-span-2 shadow-sm border-muted">
+              <CardHeader>
+                <CardTitle>SEO & Meta</CardTitle>
+                <CardDescription>Search engine optimization and social sharing tags.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="metaTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Meta Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Best SaaS Product | Acme Inc." {...field} data-testid="input-meta-title" />
+                        </FormControl>
+                        <FormDescription>Leave blank to auto-generate from company name.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="domain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Domain</FormLabel>
+                        <FormControl>
+                          <Input placeholder="acme.com.br" {...field} data-testid="input-domain" />
+                        </FormControl>
+                        <FormDescription>Used in OG and canonical tags.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -450,6 +612,21 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                           data-testid="input-meta-description"
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="facebookVerification"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Facebook Domain Verification</FormLabel>
+                      <FormControl>
+                        <Input placeholder="abcdef1234567890" {...field} data-testid="input-facebook-verification" />
+                      </FormControl>
+                      <FormDescription>Value for the <code>facebook-domain-verification</code> meta tag.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

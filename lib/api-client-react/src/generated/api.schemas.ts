@@ -23,6 +23,13 @@ export interface Company {
   metaDescription?: string | null;
   subdomain: string;
   htmlContent?: string | null;
+  about?: string | null;
+  services?: string | null;
+  mapsQuery?: string | null;
+  facebookVerification?: string | null;
+  domain?: string | null;
+  status?: string | null;
+  foundationDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,6 +46,13 @@ export interface CompanyCreateInput {
   metaTitle?: string | null;
   metaDescription?: string | null;
   subdomain: string;
+  about?: string | null;
+  services?: string | null;
+  mapsQuery?: string | null;
+  facebookVerification?: string | null;
+  domain?: string | null;
+  status?: string | null;
+  foundationDate?: string | null;
 }
 
 export interface CompanyUpdateInput {
@@ -53,6 +67,13 @@ export interface CompanyUpdateInput {
   metaTitle?: string | null;
   metaDescription?: string | null;
   subdomain?: string;
+  about?: string | null;
+  services?: string | null;
+  mapsQuery?: string | null;
+  facebookVerification?: string | null;
+  domain?: string | null;
+  status?: string | null;
+  foundationDate?: string | null;
 }
 
 export interface DashboardStats {

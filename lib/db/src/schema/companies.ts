@@ -16,6 +16,13 @@ export const companiesTable = pgTable("companies", {
   metaDescription: text("meta_description"),
   subdomain: text("subdomain").notNull().unique(),
   htmlContent: text("html_content"),
+  about: text("about"),
+  services: text("services"),
+  mapsQuery: text("maps_query"),
+  facebookVerification: text("facebook_verification"),
+  domain: text("domain"),
+  status: text("status"),
+  foundationDate: text("foundation_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -23,7 +23,7 @@ export const ListCompaniesQueryParams = zod.object({
   city: zod.coerce.string().optional(),
 });
 
-export const ListCompaniesResponseItem = zod.object({
+const companyShape = {
   id: zod.string(),
   cnpj: zod.string().nullish(),
   name: zod.string(),
@@ -37,9 +37,18 @@ export const ListCompaniesResponseItem = zod.object({
   metaDescription: zod.string().nullish(),
   subdomain: zod.string(),
   htmlContent: zod.string().nullish(),
+  about: zod.string().nullish(),
+  services: zod.string().nullish(),
+  mapsQuery: zod.string().nullish(),
+  facebookVerification: zod.string().nullish(),
+  domain: zod.string().nullish(),
+  status: zod.string().nullish(),
+  foundationDate: zod.string().nullish(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
-});
+};
+
+export const ListCompaniesResponseItem = zod.object(companyShape);
 export const ListCompaniesResponse = zod.array(ListCompaniesResponseItem);
 
 /**
@@ -57,6 +66,13 @@ export const CreateCompanyBody = zod.object({
   metaTitle: zod.string().nullish(),
   metaDescription: zod.string().nullish(),
   subdomain: zod.string(),
+  about: zod.string().nullish(),
+  services: zod.string().nullish(),
+  mapsQuery: zod.string().nullish(),
+  facebookVerification: zod.string().nullish(),
+  domain: zod.string().nullish(),
+  status: zod.string().nullish(),
+  foundationDate: zod.string().nullish(),
 });
 
 /**
@@ -66,23 +82,7 @@ export const GetCompanyParams = zod.object({
   id: zod.coerce.string(),
 });
 
-export const GetCompanyResponse = zod.object({
-  id: zod.string(),
-  cnpj: zod.string().nullish(),
-  name: zod.string(),
-  phone: zod.string().nullish(),
-  whatsapp: zod.string().nullish(),
-  email: zod.string().nullish(),
-  address: zod.string().nullish(),
-  city: zod.string().nullish(),
-  state: zod.string().nullish(),
-  metaTitle: zod.string().nullish(),
-  metaDescription: zod.string().nullish(),
-  subdomain: zod.string(),
-  htmlContent: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-  updatedAt: zod.coerce.date(),
-});
+export const GetCompanyResponse = zod.object(companyShape);
 
 /**
  * @summary Update a company
@@ -103,25 +103,16 @@ export const UpdateCompanyBody = zod.object({
   metaTitle: zod.string().nullish(),
   metaDescription: zod.string().nullish(),
   subdomain: zod.string().optional(),
+  about: zod.string().nullish(),
+  services: zod.string().nullish(),
+  mapsQuery: zod.string().nullish(),
+  facebookVerification: zod.string().nullish(),
+  domain: zod.string().nullish(),
+  status: zod.string().nullish(),
+  foundationDate: zod.string().nullish(),
 });
 
-export const UpdateCompanyResponse = zod.object({
-  id: zod.string(),
-  cnpj: zod.string().nullish(),
-  name: zod.string(),
-  phone: zod.string().nullish(),
-  whatsapp: zod.string().nullish(),
-  email: zod.string().nullish(),
-  address: zod.string().nullish(),
-  city: zod.string().nullish(),
-  state: zod.string().nullish(),
-  metaTitle: zod.string().nullish(),
-  metaDescription: zod.string().nullish(),
-  subdomain: zod.string(),
-  htmlContent: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-  updatedAt: zod.coerce.date(),
-});
+export const UpdateCompanyResponse = zod.object(companyShape);
 
 /**
  * @summary Delete a company
@@ -137,23 +128,7 @@ export const GenerateCompanyPageParams = zod.object({
   id: zod.coerce.string(),
 });
 
-export const GenerateCompanyPageResponse = zod.object({
-  id: zod.string(),
-  cnpj: zod.string().nullish(),
-  name: zod.string(),
-  phone: zod.string().nullish(),
-  whatsapp: zod.string().nullish(),
-  email: zod.string().nullish(),
-  address: zod.string().nullish(),
-  city: zod.string().nullish(),
-  state: zod.string().nullish(),
-  metaTitle: zod.string().nullish(),
-  metaDescription: zod.string().nullish(),
-  subdomain: zod.string(),
-  htmlContent: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-  updatedAt: zod.coerce.date(),
-});
+export const GenerateCompanyPageResponse = zod.object(companyShape);
 
 /**
  * @summary Get company by subdomain
@@ -162,23 +137,7 @@ export const GetCompanyBySubdomainParams = zod.object({
   subdomain: zod.coerce.string(),
 });
 
-export const GetCompanyBySubdomainResponse = zod.object({
-  id: zod.string(),
-  cnpj: zod.string().nullish(),
-  name: zod.string(),
-  phone: zod.string().nullish(),
-  whatsapp: zod.string().nullish(),
-  email: zod.string().nullish(),
-  address: zod.string().nullish(),
-  city: zod.string().nullish(),
-  state: zod.string().nullish(),
-  metaTitle: zod.string().nullish(),
-  metaDescription: zod.string().nullish(),
-  subdomain: zod.string(),
-  htmlContent: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-  updatedAt: zod.coerce.date(),
-});
+export const GetCompanyBySubdomainResponse = zod.object(companyShape);
 
 /**
  * @summary Get dashboard summary stats
@@ -199,23 +158,7 @@ export const GetRecentCompaniesQueryParams = zod.object({
   limit: zod.coerce.number().default(getRecentCompaniesQueryLimitDefault),
 });
 
-export const GetRecentCompaniesResponseItem = zod.object({
-  id: zod.string(),
-  cnpj: zod.string().nullish(),
-  name: zod.string(),
-  phone: zod.string().nullish(),
-  whatsapp: zod.string().nullish(),
-  email: zod.string().nullish(),
-  address: zod.string().nullish(),
-  city: zod.string().nullish(),
-  state: zod.string().nullish(),
-  metaTitle: zod.string().nullish(),
-  metaDescription: zod.string().nullish(),
-  subdomain: zod.string(),
-  htmlContent: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-  updatedAt: zod.coerce.date(),
-});
+export const GetRecentCompaniesResponseItem = zod.object(companyShape);
 export const GetRecentCompaniesResponse = zod.array(
   GetRecentCompaniesResponseItem,
 );
