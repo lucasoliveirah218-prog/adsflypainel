@@ -26,3 +26,16 @@ externalPort = 8080
 [[ports]]
 localPort = 8081
 externalPort = 80
+
+[[ports]]
+localPort = 22133
+externalPort = 3000
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://ljbybudqvenrpniwcnlf.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYnlidWRxdmVucnBuaXdjbmxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzM0MzYsImV4cCI6MjA5Mzg0OTQzNn0.YKXX63hT-_lquOZvmmP-6xb8uYSm8hbMm7RCxXDL3mw"

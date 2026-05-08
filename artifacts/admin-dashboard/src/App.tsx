@@ -1,0 +1,92 @@
+import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+import NotFound from "@/pages/not-found";
+import Layout from "@/components/layout";
+import Login from "@/pages/login";
+import Dashboard from "@/pages/admin/dashboard";
+import CompaniesList from "@/pages/admin/companies/index";
+import CompanyForm from "@/pages/admin/companies/form";
+import SubdomainPage from "@/pages/public/subdomain";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function ProtectedRoute({ component: Component, ...rest }: { component: any }) {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+      if (!session) {
+        setLocation("/login");
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        setLocation("/login");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setLocation]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!session) {
+    return null;
+  }
+
+  return <Layout><Component {...rest} /></Layout>;
+}
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="/admin" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/admin/companies" component={() => <ProtectedRoute component={CompaniesList} />} />
+      <Route path="/admin/companies/new" component={() => <ProtectedRoute component={CompanyForm} />} />
+      <Route path="/admin/companies/:id/edit" component={(params) => <ProtectedRoute component={CompanyForm} id={params.id} />} />
+      <Route path="/:subdomain" component={SubdomainPage} />
+      <Route path="/">
+        <Redirect to="/admin" />
+      </Route>
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
