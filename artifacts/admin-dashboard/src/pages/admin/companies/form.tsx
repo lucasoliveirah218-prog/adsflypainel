@@ -235,6 +235,22 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       const allServices = [primaryCnae, ...secondaryCnaes].filter(Boolean).join("; ");
       form.setValue("services", allServices, { shouldValidate: true });
 
+      if (!form.getValues("about")) {
+        const cityState = [data.municipio, data.uf].filter(Boolean).join("/");
+        const activityDesc = data.cnae_fiscal_descricao || "";
+        const natureza = data.descricao_natureza_juridica || "";
+        const parts: string[] = [];
+        if (data.razao_social && activityDesc) {
+          parts.push(`${data.razao_social} é uma empresa${natureza ? ` do tipo ${natureza.toLowerCase()}` : ""} localizada em ${cityState || "Brasil"}, atuando no setor de ${activityDesc.toLowerCase()}.`);
+        }
+        if (secondaryCnaes.length > 0) {
+          parts.push(`Também desenvolve atividades em: ${secondaryCnaes.slice(0, 3).map((s: string) => s.toLowerCase()).join(", ")}.`);
+        }
+        if (parts.length > 0) {
+          form.setValue("about", parts.join(" "), { shouldValidate: true });
+        }
+      }
+
       if (!form.getValues("mapsQuery") && (data.logradouro || data.municipio)) {
         const mq = [data.logradouro, data.numero, data.municipio, data.uf]
           .filter(Boolean)

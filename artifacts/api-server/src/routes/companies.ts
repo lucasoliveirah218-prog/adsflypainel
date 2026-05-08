@@ -167,8 +167,15 @@ function generateHtml(company: typeof companiesTable.$inferSelect): string {
   const cnpj = company.cnpj ?? "";
   const status = company.status ?? "";
   const foundationDate = company.foundationDate ?? "";
-  const about = company.about ?? "";
   const services = company.services ?? "";
+  const about =
+    company.about ||
+    (services
+      ? `${name} atua no setor de: ${services.split(";")[0].trim()}.`
+      : company.metaDescription
+      ? company.metaDescription
+      : "");
+
   const mapsQuery = encodeURIComponent(
     company.mapsQuery ?? [address, city, state].filter(Boolean).join(", "),
   );
