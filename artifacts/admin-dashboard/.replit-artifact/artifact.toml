@@ -19,7 +19,7 @@ run = "pnpm --filter @workspace/admin-dashboard run dev"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/admin-dashboard", "run", "build" ]
-publicDir = "artifacts/admin-dashboard/dist/public"
+publicDir = "dist"
 serve = "static"
 
 [[services.production.rewrites]]
