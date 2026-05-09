@@ -21,8 +21,9 @@ export default function Login() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       setLocation("/admin");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to login");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to login";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

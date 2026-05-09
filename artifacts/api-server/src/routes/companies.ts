@@ -247,7 +247,6 @@ router.get("/subdomain/:subdomain", async (req: Request, res: Response) => {
       return;
     }
     const mapped = mapCompany(company);
-    mapped.htmlContent = generateHtml(company);
     res.json(mapped);
   } catch (err) {
     res.status(500).json({ error: String(err) });

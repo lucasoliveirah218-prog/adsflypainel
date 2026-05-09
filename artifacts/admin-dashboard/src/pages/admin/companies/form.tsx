@@ -128,8 +128,9 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         toast.success("Company created!", { description: url });
         setLocation("/admin/companies");
       },
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.error || "Failed to create company");
+      onError: (err: unknown) => {
+        const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+        toast.error(msg || "Failed to create company");
       },
     },
   });
@@ -143,8 +144,9 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         toast.success("Company updated!", { description: url });
         setLocation("/admin/companies");
       },
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.error || "Failed to update company");
+      onError: (err: unknown) => {
+        const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+        toast.error(msg || "Failed to update company");
       },
     },
   });
@@ -155,8 +157,9 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         queryClient.invalidateQueries({ queryKey: getGetCompanyQueryKey(id as string) });
         toast.success("Landing page generated successfully!");
       },
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.error || "Failed to generate landing page");
+      onError: (err: unknown) => {
+        const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+        toast.error(msg || "Failed to generate landing page");
       },
     }
   });

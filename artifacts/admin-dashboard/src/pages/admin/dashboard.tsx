@@ -89,7 +89,7 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ title, value, icon: Icon, loading }: { title: string; value?: number; icon: any; loading: boolean }) {
+function StatCard({ title, value, icon: Icon, loading }: { title: string; value?: number; icon: React.ComponentType<{ className?: string }>; loading: boolean }) {
   return (
     <Card className="shadow-sm border-muted">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
