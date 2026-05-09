@@ -13,6 +13,8 @@ import {
 } from "@workspace/api-zod";
 import { requireAuth } from "../middleware/auth";
 
+const BASE_DOMAIN = process.env.BASE_DOMAIN || "institucionalmente.com";
+
 const router = Router();
 
 const LANDING_PAGE_TEMPLATE = `<!DOCTYPE html>
@@ -180,7 +182,7 @@ function generateHtml(company: typeof companiesTable.$inferSelect): string {
     company.mapsQuery ?? [address, city, state].filter(Boolean).join(", "),
   );
   const facebookVerification = company.facebookVerification ?? "";
-  const domain = company.domain ?? `${company.subdomain}.domain.com`;
+  const domain = company.domain ?? `${company.subdomain}.${BASE_DOMAIN}`;
 
   return LANDING_PAGE_TEMPLATE
     .replace(/{{company}}/g, name)

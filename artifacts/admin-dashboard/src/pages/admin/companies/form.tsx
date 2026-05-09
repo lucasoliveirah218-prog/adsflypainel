@@ -113,7 +113,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         services: company.services || "",
         mapsQuery: company.mapsQuery || "",
         facebookVerification: company.facebookVerification || "",
-        domain: company.domain || "",
+        domain: company.domain || `${company.subdomain}.${BASE_DOMAIN}`,
         status: company.status || "",
         foundationDate: company.foundationDate || "",
       });
@@ -396,7 +396,20 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                       <FormLabel>Subdomain <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
                         <div className="flex items-center">
-                          <Input placeholder="acme" className="rounded-r-none focus-visible:z-10" {...field} data-testid="input-subdomain" />
+                          <Input
+                            placeholder="acme"
+                            className="rounded-r-none focus-visible:z-10"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              const newSub = e.target.value;
+                              const currentDomain = form.getValues("domain");
+                              if (!currentDomain || currentDomain.endsWith(`.${BASE_DOMAIN}`)) {
+                                form.setValue("domain", newSub ? `${newSub}.${BASE_DOMAIN}` : "", { shouldValidate: false });
+                              }
+                            }}
+                            data-testid="input-subdomain"
+                          />
                           <div className="bg-muted px-3 py-2 border border-l-0 rounded-r-md text-muted-foreground text-sm whitespace-nowrap">
                             .{BASE_DOMAIN}
                           </div>
@@ -626,11 +639,13 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                     name="domain"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Domain</FormLabel>
+                        <FormLabel>Custom Domain</FormLabel>
                         <FormControl>
-                          <Input placeholder="acme.com.br" {...field} data-testid="input-domain" />
+                          <Input placeholder={`${form.watch("subdomain") || "slug"}.${BASE_DOMAIN}`} {...field} data-testid="input-domain" />
                         </FormControl>
-                        <FormDescription>Used in OG and canonical tags.</FormDescription>
+                        <FormDescription>
+                          Auto-filled from subdomain. Override only if the company has its own domain (e.g. <code>minha-empresa.com.br</code>).
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
