@@ -21,7 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "incorpweb.com";
 const companyUrl = (subdomain: string) => `https://${subdomain}.${BASE_DOMAIN}`;
 
 export default function CompaniesList() {

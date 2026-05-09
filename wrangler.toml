@@ -3,7 +3,7 @@ main = "cloudflare-worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Routes: intercept all *.institucionalmente.com requests
+# Routes: intercept all *.incorpweb.com requests
 [[routes]]
-pattern = "*.institucionalmente.com/*"
-zone_name = "institucionalmente.com"
+pattern = "*.incorpweb.com/*"
+zone_name = "incorpweb.com"

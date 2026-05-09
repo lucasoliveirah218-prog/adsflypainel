@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "incorpweb.com";
 
 function getSubdomainFromHostname(hostname: string, baseDomain: string): string | null {
   const host = hostname.split(":")[0];

@@ -13,7 +13,7 @@ import {
 } from "@workspace/api-zod";
 import { requireAuth } from "../middleware/auth";
 
-const BASE_DOMAIN = process.env.BASE_DOMAIN || "institucionalmente.com";
+const BASE_DOMAIN = process.env.BASE_DOMAIN || "incorpweb.com";
 
 const router = Router();
 

@@ -4,7 +4,7 @@ import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-const BASE_DOMAIN = process.env.BASE_DOMAIN || "institucionalmente.com";
+const BASE_DOMAIN = process.env.BASE_DOMAIN || "incorpweb.com";
 
 const app: Express = express();
 
@@ -39,6 +39,8 @@ app.use(
         origin === `https://${BASE_DOMAIN}` ||
         origin === `https://www.${BASE_DOMAIN}` ||
         origin.endsWith(`.${BASE_DOMAIN}`) ||
+        origin === "https://incorpweb.com" ||
+        origin.endsWith(".incorpweb.com") ||
         /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
         origin.includes(".replit.app") ||
         origin.includes(".replit.dev") ||

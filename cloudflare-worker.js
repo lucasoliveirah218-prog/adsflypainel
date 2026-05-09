@@ -1,7 +1,7 @@
 /**
- * Cloudflare Worker — Wildcard Subdomain Proxy for institucionalmente.com
+ * Cloudflare Worker — Wildcard Subdomain Proxy for incorpweb.com
  *
- * This worker routes all *.institucionalmente.com requests to the Replit
+ * This worker routes all *.incorpweb.com requests to the Replit
  * deployment, preserving the subdomain in the browser URL so the React SPA
  * can detect it via window.location.hostname.
  *
@@ -16,8 +16,8 @@
  *  1. Go to Workers & Pages → Create Application → Create Worker
  *  2. Paste the content of this file, click Deploy
  *  3. Go to the worker's Settings → Triggers → Add Route:
- *       Pattern : *.institucionalmente.com/*
- *       Zone    : institucionalmente.com
+ *       Pattern : *.incorpweb.com/*
+ *       Zone    : incorpweb.com
  *
  * ─── DNS SETUP (one-time, in Cloudflare DNS) ───────────────────────────────
  *
@@ -28,7 +28,7 @@
  *    Value : 100::          ← dummy IPv6 (Workers intercept before routing)
  *    Proxy : ON  (orange cloud ☁)
  *
- *  The root domain (institucionalmente.com) should already point to Replit.
+ *  The root domain (incorpweb.com) should already point to Replit.
  *  Leave that record as-is.
  *
  * ─────────────────────────────────────────────────────────────────────────── */

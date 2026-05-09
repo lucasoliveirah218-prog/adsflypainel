@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 
-const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "incorpweb.com";
 
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats({ query: { queryKey: getGetDashboardStatsQueryKey() } });
