@@ -32,20 +32,10 @@ export default function SubdomainPage({ subdomain: subdomainProp }: { subdomain?
     );
   }
 
-  if (!company.htmlContent) {
-    return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 text-slate-700 gap-4">
-        <Globe className="w-12 h-12 text-blue-300" />
-        <h1 className="text-2xl font-bold">{company.name}</h1>
-        <p className="text-slate-500">This page is coming soon. Check back later!</p>
-      </div>
-    );
-  }
-
   return (
     <div
       className="min-h-screen w-full"
-      dangerouslySetInnerHTML={{ __html: company.htmlContent }}
+      dangerouslySetInnerHTML={{ __html: company.htmlContent ?? "" }}
       data-testid={`public-page-${company.subdomain}`}
     />
   );

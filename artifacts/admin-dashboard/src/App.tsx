@@ -2,7 +2,8 @@ import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wo
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 import NotFound from "@/pages/not-found";
@@ -43,8 +44,8 @@ function getSubdomainFromHostname(hostname: string, baseDomain: string): string 
   return null;
 }
 
-function ProtectedRoute({ component: Component, ...rest }: { component: any; [key: string]: any }) {
-  const [session, setSession] = useState<any>(null);
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [, setLocation] = useLocation();
 
@@ -77,7 +78,7 @@ function ProtectedRoute({ component: Component, ...rest }: { component: any; [ke
     return null;
   }
 
-  return <Layout><Component {...rest} /></Layout>;
+  return <Layout><Component /></Layout>;
 }
 
 function Router() {
