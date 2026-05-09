@@ -4,7 +4,12 @@ import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
+const BASE_DOMAIN = process.env.BASE_DOMAIN || "institucionalmente.com";
+
 const app: Express = express();
+
+// Trust Cloudflare's proxy layer so X-Forwarded-* headers are used correctly.
+app.set("trust proxy", 1);
 
 app.use(
   pinoHttp({
@@ -25,7 +30,26 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow server-to-server requests (no Origin header)
+      if (!origin) return callback(null, true);
+      const allowed =
+        origin === `https://${BASE_DOMAIN}` ||
+        origin === `https://www.${BASE_DOMAIN}` ||
+        origin.endsWith(`.${BASE_DOMAIN}`) ||
+        /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
+        origin.includes(".replit.app") ||
+        origin.includes(".replit.dev") ||
+        origin.includes(".repl.co");
+      callback(allowed ? null : new Error("Not allowed by CORS"), allowed);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
