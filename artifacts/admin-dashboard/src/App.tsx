@@ -22,6 +22,27 @@ const queryClient = new QueryClient({
   },
 });
 
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+
+function getSubdomainFromHostname(hostname: string, baseDomain: string): string | null {
+  const host = hostname.split(":")[0];
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    /^\d+\.\d+\.\d+\.\d+$/.test(host) ||
+    host === baseDomain ||
+    host === `www.${baseDomain}` ||
+    host === `admin.${baseDomain}`
+  ) {
+    return null;
+  }
+  if (host.endsWith(`.${baseDomain}`)) {
+    const sub = host.slice(0, host.length - baseDomain.length - 1);
+    return sub || null;
+  }
+  return null;
+}
+
 function ProtectedRoute({ component: Component, ...rest }: { component: any; [key: string]: any }) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -60,6 +81,12 @@ function ProtectedRoute({ component: Component, ...rest }: { component: any; [ke
 }
 
 function Router() {
+  const detectedSubdomain = getSubdomainFromHostname(window.location.hostname, BASE_DOMAIN);
+
+  if (detectedSubdomain) {
+    return <SubdomainPage subdomain={detectedSubdomain} />;
+  }
+
   return (
     <Switch>
       <Route path="/login" component={Login} />
@@ -67,7 +94,7 @@ function Router() {
       <Route path="/admin/companies" component={() => <ProtectedRoute component={CompaniesList} />} />
       <Route path="/admin/companies/new" component={() => <ProtectedRoute component={CompanyForm} />} />
       <Route path="/admin/companies/:id/edit" component={() => <ProtectedRoute component={CompanyForm} />} />
-      <Route path="/:subdomain" component={SubdomainPage} />
+      <Route path="/:subdomain">{() => <SubdomainPage />}</Route>
       <Route path="/">
         <Redirect to="/admin" />
       </Route>

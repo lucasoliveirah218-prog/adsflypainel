@@ -300,7 +300,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         {isEditing && (
           <div className="ml-auto flex gap-2">
             {company?.htmlContent && (
-              <a href={`/${company.subdomain}`} target="_blank" rel="noreferrer">
+              <a href={`https://${company.subdomain}.${import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com"}`} target="_blank" rel="noreferrer">
                 <Button variant="outline" data-testid="button-view-page">
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Page
@@ -375,7 +375,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                         <div className="flex items-center">
                           <Input placeholder="acme" className="rounded-r-none focus-visible:z-10" {...field} data-testid="input-subdomain" />
                           <div className="bg-muted px-3 py-2 border border-l-0 rounded-r-md text-muted-foreground text-sm whitespace-nowrap">
-                            .domain.com
+                            .institucionalmente.com
                           </div>
                         </div>
                       </FormControl>

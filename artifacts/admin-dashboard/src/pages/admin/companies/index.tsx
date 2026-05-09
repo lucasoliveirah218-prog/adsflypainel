@@ -116,7 +116,7 @@ export default function CompaniesList() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground">{company.subdomain}</span>
-                      <a href={`/${company.subdomain}`} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80" data-testid={`link-subdomain-${company.id}`}>
+                      <a href={`https://${company.subdomain}.${import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com"}`} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80" data-testid={`link-subdomain-${company.id}`}>
                         <Globe className="w-3 h-3" />
                       </a>
                     </div>

@@ -2,9 +2,9 @@ import { useParams } from "wouter";
 import { useGetCompanyBySubdomain, getGetCompanyBySubdomainQueryKey } from "@workspace/api-client-react";
 import { Loader2, Globe } from "lucide-react";
 
-export default function SubdomainPage() {
+export default function SubdomainPage({ subdomain: subdomainProp }: { subdomain?: string }) {
   const params = useParams<{ subdomain: string }>();
-  const subdomain = params?.subdomain;
+  const subdomain = subdomainProp || params?.subdomain;
 
   const { data: company, isLoading, error } = useGetCompanyBySubdomain(subdomain as string, {
     query: {

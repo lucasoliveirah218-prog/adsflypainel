@@ -66,7 +66,7 @@ export default function Dashboard() {
                   <div key={company.id} className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-sm">{company.name}</p>
-                      <p className="text-xs text-muted-foreground">{company.subdomain}.domain.com</p>
+                      <p className="text-xs text-muted-foreground">{company.subdomain}.institucionalmente.com</p>
                     </div>
                     <Link href={`/admin/companies/${company.id}/edit`}>
                       <span className="text-xs font-medium text-primary hover:underline cursor-pointer" data-testid={`link-edit-recent-${company.id}`}>
