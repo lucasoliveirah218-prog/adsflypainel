@@ -5,6 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats({ query: { queryKey: getGetDashboardStatsQueryKey() } });
   const { data: recentCompanies, isLoading: recentLoading } = useGetRecentCompanies({ limit: 5 }, { query: { queryKey: getGetRecentCompaniesQueryKey({ limit: 5 }) } });
@@ -66,7 +68,7 @@ export default function Dashboard() {
                   <div key={company.id} className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-sm">{company.name}</p>
-                      <p className="text-xs text-muted-foreground">{company.subdomain}.institucionalmente.com</p>
+                      <p className="text-xs text-muted-foreground">{company.subdomain}.{BASE_DOMAIN}</p>
                     </div>
                     <Link href={`/admin/companies/${company.id}/edit`}>
                       <span className="text-xs font-medium text-primary hover:underline cursor-pointer" data-testid={`link-edit-recent-${company.id}`}>

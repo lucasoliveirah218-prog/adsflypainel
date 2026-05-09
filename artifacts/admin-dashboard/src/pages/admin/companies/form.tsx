@@ -28,8 +28,11 @@ import {
   FormMessage 
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Search, ArrowLeft, Wand2, ExternalLink } from "lucide-react";
+import { Loader2, Search, ArrowLeft, Wand2, ExternalLink, Copy } from "lucide-react";
 import { Link } from "wouter";
+
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+const companyUrl = (subdomain: string) => `https://${subdomain}.${BASE_DOMAIN}`;
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -121,7 +124,8 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
-        toast.success("Company created successfully");
+        const url = companyUrl(form.getValues("subdomain"));
+        toast.success("Company created!", { description: url });
         setLocation("/admin/companies");
       },
       onError: (err: any) => {
@@ -135,7 +139,8 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetCompanyQueryKey(id as string) });
-        toast.success("Company updated successfully");
+        const url = companyUrl(form.getValues("subdomain"));
+        toast.success("Company updated!", { description: url });
         setLocation("/admin/companies");
       },
       onError: (err: any) => {
@@ -299,8 +304,23 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
         
         {isEditing && (
           <div className="ml-auto flex gap-2">
+            {company?.subdomain && (
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => {
+                  const url = companyUrl(company.subdomain);
+                  navigator.clipboard.writeText(url);
+                  toast.success("URL copied!", { description: url });
+                }}
+                data-testid="button-copy-url"
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copy URL
+              </Button>
+            )}
             {company?.htmlContent && (
-              <a href={`https://${company.subdomain}.${import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com"}`} target="_blank" rel="noreferrer">
+              <a href={companyUrl(company.subdomain)} target="_blank" rel="noreferrer">
                 <Button variant="outline" data-testid="button-view-page">
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Page
@@ -375,7 +395,7 @@ export default function CompanyForm({ id: idProp }: { id?: string }) {
                         <div className="flex items-center">
                           <Input placeholder="acme" className="rounded-r-none focus-visible:z-10" {...field} data-testid="input-subdomain" />
                           <div className="bg-muted px-3 py-2 border border-l-0 rounded-r-md text-muted-foreground text-sm whitespace-nowrap">
-                            .institucionalmente.com
+                            .{BASE_DOMAIN}
                           </div>
                         </div>
                       </FormControl>

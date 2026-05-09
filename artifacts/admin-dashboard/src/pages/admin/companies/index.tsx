@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Plus, Edit2, Trash2, Globe } from "lucide-react";
+import { Search, Plus, Edit2, Trash2, Globe, Copy } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -20,6 +20,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+const BASE_DOMAIN = import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com";
+const companyUrl = (subdomain: string) => `https://${subdomain}.${BASE_DOMAIN}`;
 
 export default function CompaniesList() {
   const [search, setSearch] = useState("");
@@ -36,7 +39,7 @@ export default function CompaniesList() {
         queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
         toast.success("Company deleted successfully");
       },
-      onError: (err) => {
+      onError: () => {
         toast.error("Failed to delete company");
       },
     },
@@ -44,6 +47,12 @@ export default function CompaniesList() {
 
   const handleDelete = (id: string) => {
     deleteCompany.mutate({ id });
+  };
+
+  const handleCopyUrl = (subdomain: string) => {
+    const url = companyUrl(subdomain);
+    navigator.clipboard.writeText(url);
+    toast.success("URL copied!", { description: url });
   };
 
   return (
@@ -82,7 +91,7 @@ export default function CompaniesList() {
               <TableHead>Name</TableHead>
               <TableHead>CNPJ</TableHead>
               <TableHead>Location</TableHead>
-              <TableHead>Subdomain</TableHead>
+              <TableHead>Public URL</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -94,7 +103,7 @@ export default function CompaniesList() {
                   <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-[60px]" /></TableCell>
                   <TableCell><Skeleton className="h-8 w-[100px] ml-auto" /></TableCell>
                 </TableRow>
@@ -114,11 +123,28 @@ export default function CompaniesList() {
                     {company.city && company.state ? `${company.city}, ${company.state}` : "-"}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{company.subdomain}</span>
-                      <a href={`https://${company.subdomain}.${import.meta.env.VITE_BASE_DOMAIN || "institucionalmente.com"}`} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80" data-testid={`link-subdomain-${company.id}`}>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-mono text-muted-foreground truncate max-w-[160px]">
+                        {company.subdomain}.{BASE_DOMAIN}
+                      </span>
+                      <a
+                        href={companyUrl(company.subdomain)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:text-primary/80 shrink-0"
+                        data-testid={`link-subdomain-${company.id}`}
+                      >
                         <Globe className="w-3 h-3" />
                       </a>
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-primary shrink-0"
+                        title="Copy URL"
+                        onClick={() => handleCopyUrl(company.subdomain)}
+                        data-testid={`button-copy-url-${company.id}`}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </button>
                     </div>
                   </TableCell>
                   <TableCell>
